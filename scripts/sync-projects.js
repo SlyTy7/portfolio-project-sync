@@ -26,6 +26,9 @@ const syncProjects = async () => {
     },
   });
 
+  console.log(response);
+
+
   const repos = await response.json();
 
   // Filter only repos with topic 'portfolio-project'
