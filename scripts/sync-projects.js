@@ -26,12 +26,6 @@ const syncProjects = async () => {
     },
   });
 
-
-  console.log("GitHub Token used:", process.env.PERSONAL_GITHUB_TOKEN ? "✔️ Loaded" : "❌ Missing");
-
-  console.log(response);
-
-
   const repos = await response.json();
 
   // Filter only repos with topic 'portfolio-project'
