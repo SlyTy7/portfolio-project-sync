@@ -1,0 +1,12 @@
+{
+    "name": "portfolio-project-sync",
+    "type": "module",
+    "scripts": {
+      "sync": "node scripts/sync-projects.js"
+    },
+    "dependencies": {
+      "firebase-admin": "^11.10.1",
+      "node-fetch": "^3.3.2"
+    }
+  }
+  
