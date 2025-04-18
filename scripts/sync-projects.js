@@ -23,6 +23,7 @@ const syncProjects = async () => {
     headers: {
       Authorization: `token ${process.env.PERSONAL_GITHUB_TOKEN}`,
       'User-Agent': 'portfolio-sync-script',
+      'Cache-Control': 'no-cache'
     },
   });
 
