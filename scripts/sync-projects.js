@@ -1,7 +1,6 @@
 import fetch from "node-fetch";
 import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import fs from "fs";
 
 // Load Firebase credentials from environment
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -10,7 +9,7 @@ initializeApp({ credential: cert(serviceAccount) });
 const db = getFirestore();
 
 const getProjectRepos = async () => {
-	// github api endpoint to get public and private reps of authenticaetd user
+	// github api endpoint to get public and private reps of authenticated user
 	const GITHUB_REPO_API = `https://api.github.com/user/repos?per_page=100`;
 	const response = await fetch(GITHUB_REPO_API, {
 		headers: {
@@ -22,7 +21,9 @@ const getProjectRepos = async () => {
 	});
 	// check for errors
 	if (!response.ok) {
-		throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+		throw new Error(
+			`GitHub API error: ${response.status} ${response.statusText}`
+		);
 	}
 
 	const repos = await response.json();
@@ -36,17 +37,37 @@ const getProjectRepos = async () => {
 	return portfolioRepos;
 };
 
+const checkScreenshotUrl = async (username, repoName) => {
+	const branches = ["main", "master"];
+	for (const branch of branches) {
+		const url = `https://raw.githubusercontent.com/${username}/${repoName}/${branch}/public/screenshot.png`;
+		try {
+			const response = await fetch(url, { method: "HEAD" });
+			if (response.ok) {
+				return url;
+			}
+		} catch (err) {
+			console.warn(
+				`Error checking screenshot URL for ${repoName}:`,
+				err.message
+			);
+		}
+	}
+	return ""; // if none found
+};
+
 const syncProjects = async () => {
 	const GITHUB_USERNAME = "slyty7";
 
 	const batch = db.batch();
-
 	const portfolioRepos = await getProjectRepos();
 
-	// update/create its entry in firebase db
-	portfolioRepos.forEach((repo) => {
+	for (const repo of portfolioRepos) {
 		const docRef = db.collection("projects").doc(repo.name);
-		const screenshotPath = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${repo.name}/main/public/screenshot.png`;
+		const screenshotPath = await checkScreenshotUrl(
+			GITHUB_USERNAME,
+			repo.name
+		);
 		const socialPreviewPath = `https://opengraph.githubassets.com/1/${GITHUB_USERNAME}/${repo.name}`;
 
 		batch.set(docRef, {
@@ -56,10 +77,10 @@ const syncProjects = async () => {
 			description: repo.description || "",
 			topics: repo.topics || [],
 			updatedAt: repo.updated_at,
-			screenshot:screenshotPath,
+			screenshot: screenshotPath,
 			socialPreview: socialPreviewPath,
 		});
-	});
+	}
 
 	await batch.commit();
 	console.log("Projects synced to Firebase.");
