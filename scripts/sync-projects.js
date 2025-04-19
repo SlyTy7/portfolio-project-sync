@@ -13,8 +13,10 @@ initializeApp({
 
 const db = getFirestore();
 
-const GITHUB_USERNAME = 'slyty7';
-const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100`;
+//const GITHUB_USERNAME = 'slyty7';
+//const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100`;
+const GITHUB_API = 'https://api.github.com/user/repos?per_page=100';
+
 
 const syncProjects = async () => {
   console.log('Fetching GitHub repos...');
@@ -29,7 +31,6 @@ const syncProjects = async () => {
   });
 
   const repos = await response.json();
-  console.log(repos.length())
 
   // Filter only repos with topic 'portfolio-project'
   const portfolioRepos = repos.filter(repo =>
