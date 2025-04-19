@@ -23,12 +23,13 @@ const syncProjects = async () => {
     headers: {
       Authorization: `token ${process.env.PERSONAL_GITHUB_TOKEN}`,
       'User-Agent': 'portfolio-sync-script',
-      'Cache-Control': 'no-cache'
+      'Cache-Control': 'no-cache',
+      'accept': 'application/vnd.github+json'
     },
   });
 
   const repos = await response.json();
-
+  console.log(repos)
   // Filter only repos with topic 'portfolio-project'
   const portfolioRepos = repos.filter(repo =>
     repo.topics?.includes('portfolio-project')
