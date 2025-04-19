@@ -77,6 +77,7 @@ const syncProjects = async () => {
 			description: repo.description || "",
 			topics: repo.topics || [],
 			updatedAt: repo.updated_at,
+			createdAt: repo.created_at,
 			screenshot: screenshotPath,
 			socialPreview: socialPreviewPath,
 		});
