@@ -36,28 +36,6 @@ const getProjectRepos = async () => {
 	return portfolioRepos;
 };
 
-
-/*
-const getRepoScreenshot = async () => {
-	const GITHUB_REPO_API = "https://api.github.com/user/repos?per_page=100";
-
-	let imageLink;
-
-	const response = await fetch(GITHUB_REPO_API, {
-		owner: "OWNER",
-		repo: "REPO",
-		path: "PATH",
-		headers: {
-			Authorization: `token ${process.env.PERSONAL_GITHUB_TOKEN}`,
-			"User-Agent": "portfolio-sync-script",
-			"Cache-Control": "no-cache",
-		},
-	});
-	const repos = await response.json();
-
-	return imageLink;
-};
-*/
 const syncProjects = async () => {
 	const GITHUB_USERNAME = "slyty7";
 
@@ -68,6 +46,9 @@ const syncProjects = async () => {
 	// update/create its entry in firebase db
 	portfolioRepos.forEach((repo) => {
 		const docRef = db.collection("projects").doc(repo.name);
+		const screenshotPath = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${repo.name}/main/public/screenshot.png`;
+		const socialPreviewPath = `https://opengraph.githubassets.com/1/${GITHUB_USERNAME}/${repo.name}`;
+
 		batch.set(docRef, {
 			name: repo.name,
 			githubUrl: repo.html_url,
@@ -75,7 +56,8 @@ const syncProjects = async () => {
 			description: repo.description || "",
 			topics: repo.topics || [],
 			updatedAt: repo.updated_at,
-			socialPreview: `https://opengraph.githubassets.com/1/${GITHUB_USERNAME}/${repo.name}`,
+			screenshot:screenshotPath,
+			socialPreview: socialPreviewPath,
 		});
 	});
 
