@@ -9,9 +9,9 @@ initializeApp({ credential: cert(serviceAccount) });
 
 const db = getFirestore();
 
-const getProjectRepos = async (user) => {
+const getProjectRepos = async () => {
 	// github api endpoint to get public and private reps of authenticaetd user
-	const GITHUB_REPO_API = `https://api.github.com/users/${user}/repos?per_page=100`;
+	const GITHUB_REPO_API = `https://api.github.com/user/repos?per_page=100`;
 	const response = await fetch(GITHUB_REPO_API, {
 		headers: {
 			Authorization: `token ${process.env.PERSONAL_GITHUB_TOKEN}`,
@@ -63,8 +63,9 @@ const syncProjects = async () => {
 
 	const batch = db.batch();
 
-	const portfolioRepos = await getProjectRepos(GITHUB_USERNAME);
+	const portfolioRepos = await getProjectRepos();
 
+	// update/create its entry in firebase db
 	portfolioRepos.forEach((repo) => {
 		const docRef = db.collection("projects").doc(repo.name);
 		batch.set(docRef, {
