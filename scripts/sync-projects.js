@@ -14,7 +14,7 @@ initializeApp({
 const db = getFirestore();
 
 const GITHUB_USERNAME = 'slyty7';
-const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos`;
+const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}/repos?per_page=100`;
 
 const syncProjects = async () => {
   console.log('Fetching GitHub repos...');
