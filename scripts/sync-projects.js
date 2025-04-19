@@ -1,4 +1,3 @@
-// scripts/sync-projects.js
 import fetch from "node-fetch";
 import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
@@ -6,30 +5,27 @@ import fs from "fs";
 
 // Load Firebase credentials from environment
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-
-initializeApp({
-	credential: cert(serviceAccount),
-});
+initializeApp({ credential: cert(serviceAccount) });
 
 const db = getFirestore();
 
-const GITHUB_USERNAME = "slyty7";
-const GITHUB_API = "https://api.github.com/user/repos?per_page=100";
-
-const syncProjects = async () => {
-	console.log("Fetching GitHub repos...");
-
-	const response = await fetch(GITHUB_API, {
+const getProjectRepos = async (user) => {
+	// github api endpoint to get public and private reps of authenticaetd user
+	const GITHUB_REPO_API = `https://api.github.com/users/${user}/repos?per_page=100`;
+	const response = await fetch(GITHUB_REPO_API, {
 		headers: {
 			Authorization: `token ${process.env.PERSONAL_GITHUB_TOKEN}`,
 			"User-Agent": "portfolio-sync-script",
 			"Cache-Control": "no-cache",
-			accept: "application/vnd.github+json",
+			Accept: "application/vnd.github+json",
 		},
 	});
+	// check for errors
+	if (!response.ok) {
+		throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+	}
 
 	const repos = await response.json();
-
 	// Filter only repos with topic 'portfolio-project'
 	const portfolioRepos = repos.filter((repo) =>
 		repo.topics?.includes("portfolio-project")
@@ -37,7 +33,37 @@ const syncProjects = async () => {
 
 	console.log(`Found ${portfolioRepos.length} portfolio projects.`);
 
+	return portfolioRepos;
+};
+
+
+/*
+const getRepoScreenshot = async () => {
+	const GITHUB_REPO_API = "https://api.github.com/user/repos?per_page=100";
+
+	let imageLink;
+
+	const response = await fetch(GITHUB_REPO_API, {
+		owner: "OWNER",
+		repo: "REPO",
+		path: "PATH",
+		headers: {
+			Authorization: `token ${process.env.PERSONAL_GITHUB_TOKEN}`,
+			"User-Agent": "portfolio-sync-script",
+			"Cache-Control": "no-cache",
+		},
+	});
+	const repos = await response.json();
+
+	return imageLink;
+};
+*/
+const syncProjects = async () => {
+	const GITHUB_USERNAME = "slyty7";
+
 	const batch = db.batch();
+
+	const portfolioRepos = await getProjectRepos(GITHUB_USERNAME);
 
 	portfolioRepos.forEach((repo) => {
 		const docRef = db.collection("projects").doc(repo.name);
