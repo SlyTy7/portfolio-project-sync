@@ -57,35 +57,36 @@ const getScreenshotUrl = async (username, repoName) => {
 };
 
 const getDisplayName = async (username, repoName) => {
-	const GITHUB_REPO_API = `https://api.github.com/repos/${username}/${repoName}/properties/values`;
-	const response = await fetch(GITHUB_REPO_API, {
-		headers: {
-			Authorization: `token ${process.env.PERSONAL_GITHUB_TOKEN}`,
-			"User-Agent": "portfolio-sync-script",
-			"Cache-Control": "no-cache",
-			Accept: "application/vnd.github+json",
-		},
-	});
+	const readmeRes = await fetch(
+		`https://api.github.com/repos/${username}/${repoName}/readme`,
+		{
+			headers: {
+				Authorization: `token ${process.env.PERSONAL_GITHUB_TOKEN}`,
+				Accept: "application/vnd.github+json",
+			},
+		}
+	);
 
-	console.log(response)
-
-	// check for errors
-	if (!response.ok) {
-		throw new Error(
-			`GitHub API error: ${response.status} ${response.statusText}`
-		);
+	if (!readmeRes.ok) {
+		throw new Error(`Failed to fetch README: ${readmeRes.status}`);
 	}
 
-	// filter out custom display_name property
-	const properties = await response.json();
-	const displayNameProp = properties.find(
-		prop => prop.property_name === "display_name" && prop.value
-	);
-	// fallback on repo name if no display_name
-	const displayName = displayNameProp?.value || repoName;
+	const readmeData = await readmeRes.json();
+	const content = Buffer.from(readmeData.content, "base64").toString("utf-8");
+	// parsed from tag <!-- portfolio-meta display_name: Project Name -->
+	const metaMatch = content.match(/<!--\s*portfolio-meta([\s\S]*?)-->/);
+	// use repo name if no display_name found in meta tag
+	let displayName = repoName;
+	if (metaMatch) {
+		const metaContent = metaMatch[1];
+		const displayNameMatch = metaContent.match(/display_name:\s*(.+)/);
+		if (displayNameMatch) {
+			displayName = displayNameMatch[1].trim();
+		}
+	}
 
 	return displayName;
-}
+};
 
 const syncProjects = async () => {
 	const GITHUB_USERNAME = "slyty7";
