@@ -67,6 +67,8 @@ const getDisplayName = async (username, repoName) => {
 		}
 	);
 
+	console.log(readmeRes)
+
 	if (!readmeRes.ok) {
 		throw new Error(`Failed to fetch README: ${readmeRes.status}`);
 	}
