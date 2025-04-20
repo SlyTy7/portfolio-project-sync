@@ -57,12 +57,8 @@ const getScreenshotUrl = async (username, repoName) => {
 };
 
 const getDisplayName = async (username, repoName) => {
-	let displayName = repoName;
-
-	const GITHUB_REPO_API = `https://api.github.com/repos/{owner}/{repo}/properties/values`;
+	const GITHUB_REPO_API = `https://api.github.com/repos/${username}/${repoName}/properties/values`;
 	const response = await fetch(GITHUB_REPO_API, {
-		owner: username,
-		repo: repoName,
 		headers: {
 			Authorization: `token ${process.env.PERSONAL_GITHUB_TOKEN}`,
 			"User-Agent": "portfolio-sync-script",
@@ -78,20 +74,15 @@ const getDisplayName = async (username, repoName) => {
 		);
 	}
 
+	// filter out custom display_name property
+	const properties = await response.json();
+	const displayNameProp = properties.find(
+		prop => prop.property_name === "display_name" && prop.value
+	);
+	// fallback on repo name if no display_name
+	const displayName = displayNameProp?.value || repoName;
 
-	// const properties = await response.json();
-	/*
-	properties.forEach((property) => {
-		if(property.property_name == "display_name"){
-			if(property.value){
-				displayName = property.value;
-			}
-		}
-	})
-	*/
 	console.log(response)
-
-
 
 	return displayName;
 }
