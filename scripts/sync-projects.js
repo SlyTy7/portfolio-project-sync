@@ -67,14 +67,13 @@ const getDisplayName = async (username, repoName) => {
 		}
 	);
 
-	console.log(readmeRes)
-
 	if (!readmeRes.ok) {
-		throw new Error(`Failed to fetch README: ${readmeRes.status}`);
+		console.error(`Failed to fetch README: ${readmeRes.status}`);
 	}
 
 	const readmeData = await readmeRes.json();
 	const content = Buffer.from(readmeData.content, "base64").toString("utf-8");
+	console.log(content)
 	// parsed from tag <!-- portfolio-meta display_name: Project Name -->
 	const metaMatch = content.match(/<!--\s*portfolio-meta([\s\S]*?)-->/);
 	// use repo name if no display_name found in meta tag
