@@ -57,6 +57,7 @@ const getScreenshotUrl = async (username, repoName) => {
 };
 
 const getDisplayName = async (username, repoName) => {
+	let displayName = repoName;
 	const readmeRes = await fetch(
 		`https://api.github.com/repos/${username}/${repoName}/readme`,
 		{
@@ -67,24 +68,27 @@ const getDisplayName = async (username, repoName) => {
 		}
 	);
 
-	if (!readmeRes.ok) {
+	// if a README is found
+	if (readmeRes.ok) {
+		const readmeData = await readmeRes.json();
+		const content = Buffer.from(readmeData.content, "base64").toString(
+			"utf-8"
+		);
+		// parsed from tag <!-- portfolio-meta display_name: Project Name -->
+		const metaMatch = content.match(/<!--\s*portfolio-meta([\s\S]*?)-->/);
+		// if meta tag found in README
+		if (metaMatch) {
+			const metaContent = metaMatch[1];
+			const displayNameMatch = metaContent.match(/display_name:\s*(.+)/);
+			if (displayNameMatch) {
+				displayName = displayNameMatch[1].trim();
+			}
+		}
+	} else {
 		console.error(`Failed to fetch README: ${readmeRes.status}`);
 	}
 
-	const readmeData = await readmeRes.json();
-	const content = Buffer.from(readmeData.content, "base64").toString("utf-8");
-	console.log(content)
-	// parsed from tag <!-- portfolio-meta display_name: Project Name -->
-	const metaMatch = content.match(/<!--\s*portfolio-meta([\s\S]*?)-->/);
-	// use repo name if no display_name found in meta tag
-	let displayName = repoName;
-	if (metaMatch) {
-		const metaContent = metaMatch[1];
-		const displayNameMatch = metaContent.match(/display_name:\s*(.+)/);
-		if (displayNameMatch) {
-			displayName = displayNameMatch[1].trim();
-		}
-	}
+	console.log(displayName);
 
 	return displayName;
 };
