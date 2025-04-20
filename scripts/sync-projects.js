@@ -37,7 +37,7 @@ const getProjectRepos = async () => {
 	return portfolioRepos;
 };
 
-const checkScreenshotUrl = async (username, repoName) => {
+const getScreenshotUrl = async (username, repoName) => {
 	const branches = ["main", "master"];
 	for (const branch of branches) {
 		const url = `https://raw.githubusercontent.com/${username}/${repoName}/${branch}/public/screenshot.png`;
@@ -64,7 +64,7 @@ const syncProjects = async () => {
 
 	for (const repo of portfolioRepos) {
 		const docRef = db.collection("projects").doc(repo.name);
-		const screenshotPath = await checkScreenshotUrl(
+		const screenshotPath = await getScreenshotUrl(
 			GITHUB_USERNAME,
 			repo.name
 		);
