@@ -56,6 +56,46 @@ const getScreenshotUrl = async (username, repoName) => {
 	return ""; // if none found
 };
 
+const getDisplayName = async (username, repoName) => {
+	let displayName = repoName;
+
+	const GITHUB_REPO_API = `https://api.github.com/repos/{owner}/{repo}/properties/values`;
+	const response = await fetch(GITHUB_REPO_API, {
+		owner: username,
+		repo: repoName,
+		headers: {
+			Authorization: `token ${process.env.PERSONAL_GITHUB_TOKEN}`,
+			"User-Agent": "portfolio-sync-script",
+			"Cache-Control": "no-cache",
+			Accept: "application/vnd.github+json",
+		},
+	});
+
+	// check for errors
+	if (!response.ok) {
+		throw new Error(
+			`GitHub API error: ${response.status} ${response.statusText}`
+		);
+	}
+
+
+	// const properties = await response.json();
+	/*
+	properties.forEach((property) => {
+		if(property.property_name == "display_name"){
+			if(property.value){
+				displayName = property.value;
+			}
+		}
+	})
+	*/
+	console.log(response)
+
+
+
+	return displayName;
+}
+
 const syncProjects = async () => {
 	const GITHUB_USERNAME = "slyty7";
 
@@ -69,9 +109,10 @@ const syncProjects = async () => {
 			repo.name
 		);
 		const socialPreviewPath = `https://opengraph.githubassets.com/1/${GITHUB_USERNAME}/${repo.name}`;
+		const displayName = await getDisplayName(GITHUB_USERNAME, repo.name);
 
 		batch.set(docRef, {
-			name: repo.name,
+			name: displayName,
 			githubUrl: repo.html_url,
 			liveUrl: repo.homepage || "",
 			description: repo.description || "",
