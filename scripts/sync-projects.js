@@ -88,8 +88,6 @@ const getDisplayName = async (username, repoName) => {
 		console.error(`Failed to fetch README: ${readmeRes.status}`);
 	}
 
-	console.log(displayName);
-
 	return displayName;
 };
 
