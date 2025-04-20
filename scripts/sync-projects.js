@@ -67,6 +67,8 @@ const getDisplayName = async (username, repoName) => {
 		},
 	});
 
+	console.log(response)
+
 	// check for errors
 	if (!response.ok) {
 		throw new Error(
@@ -81,8 +83,6 @@ const getDisplayName = async (username, repoName) => {
 	);
 	// fallback on repo name if no display_name
 	const displayName = displayNameProp?.value || repoName;
-
-	console.log(response)
 
 	return displayName;
 }
