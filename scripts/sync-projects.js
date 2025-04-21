@@ -38,27 +38,29 @@ const getProjectRepos = async () => {
 };
 
 const getScreenshotUrl = async (username, repoName) => {
+	let screenshotUrl = "";
 	const branches = ["main", "master"];
 	for (const branch of branches) {
 		const url = `https://raw.githubusercontent.com/${username}/${repoName}/${branch}/public/screenshot.png`;
-		if(isUrlValid(url)){
-			return url;
+		if (isUrlValid(url)) {
+			screenshotUrl = url;
 		}
 	}
-	return ""; // if none found
+	return screenshotUrl;
 };
 
 const getSocialPreviewUrl = async (username, repoName) => {
+	let socialPreviewUrl = "";
 	const url = `https://opengraph.githubassets.com/1/${username}/${repoName}`;
 
-	if(isUrlValid(url)){
-		return url;
+	if (isUrlValid(url)) {
+		socialPreviewUrl = url;
 	}
 
-	return "";
-}
+	return socialPreviewUrl;
+};
 
-const isUrlValid = async url => {
+const isUrlValid = async (url) => {
 	let isValid = false;
 
 	try {
@@ -67,14 +69,11 @@ const isUrlValid = async url => {
 			isValid = true;
 		}
 	} catch (err) {
-		console.warn(
-			`URL invalid at: ${url}:`,
-			err.message
-		);
+		console.warn(`URL invalid at: ${url}:`, err.message);
 	}
 
 	return isValid;
-}
+};
 
 const getDisplayName = async (username, repoName) => {
 	let displayName = repoName;
