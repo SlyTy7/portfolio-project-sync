@@ -65,6 +65,8 @@ const isUrlValid = async (url) => {
 
 	try {
 		const response = await fetch(url, { method: "HEAD" });
+
+		console.log(response);
 		if (response.ok) {
 			isValid = true;
 		}
