@@ -48,6 +48,16 @@ const getScreenshotUrl = async (username, repoName) => {
 	return ""; // if none found
 };
 
+const getSocialPreviewUrl = async (username, repoName) => {
+	const url = `https://opengraph.githubassets.com/1/${username}/${repoName}`;
+
+	if(isUrlValid(url)){
+		return url;
+	}
+
+	return "";
+}
+
 const isUrlValid = async url => {
 	let isValid = false;
 
@@ -113,7 +123,10 @@ const syncProjects = async () => {
 			GITHUB_USERNAME,
 			repo.name
 		);
-		const socialPreviewPath = `https://opengraph.githubassets.com/1/${GITHUB_USERNAME}/${repo.name}`;
+		const socialPreviewPath = await getSocialPreviewUrl(
+			GITHUB_USERNAME,
+			repo.name
+		);
 		const displayName = await getDisplayName(GITHUB_USERNAME, repo.name);
 
 		batch.set(docRef, {
