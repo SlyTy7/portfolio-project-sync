@@ -1,3 +1,4 @@
+<!-- portfolio-meta display_name: Portfolio Project Sync -->
 # 🔄 Portfolio Project Sync
 
 Automatically sync your personal GitHub repositories to Firebase to power your developer portfolio. No more copy-pasting project info — this GitHub Action does it for you.
