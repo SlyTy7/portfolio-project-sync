@@ -41,20 +41,30 @@ const getScreenshotUrl = async (username, repoName) => {
 	const branches = ["main", "master"];
 	for (const branch of branches) {
 		const url = `https://raw.githubusercontent.com/${username}/${repoName}/${branch}/public/screenshot.png`;
-		try {
-			const response = await fetch(url, { method: "HEAD" });
-			if (response.ok) {
-				return url;
-			}
-		} catch (err) {
-			console.warn(
-				`Error checking screenshot URL for ${repoName}:`,
-				err.message
-			);
+		if(isUrlValid(url)){
+			return url;
 		}
 	}
 	return ""; // if none found
 };
+
+const isUrlValid = async url => {
+	let isValid = false;
+
+	try {
+		const response = await fetch(url, { method: "HEAD" });
+		if (response.ok) {
+			isValid = true;
+		}
+	} catch (err) {
+		console.warn(
+			`URL invalid at: ${url}:`,
+			err.message
+		);
+	}
+
+	return isValid;
+}
 
 const getDisplayName = async (username, repoName) => {
 	let displayName = repoName;
