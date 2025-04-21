@@ -50,14 +50,9 @@ const getScreenshotUrl = async (username, repoName) => {
 };
 
 const getSocialPreviewUrl = async (username, repoName) => {
-	let socialPreviewUrl = "";
 	const url = `https://opengraph.githubassets.com/1/${username}/${repoName}`;
 
-	if (isUrlValid(url)) {
-		socialPreviewUrl = url;
-	}
-
-	return socialPreviewUrl;
+	return url
 };
 
 const isUrlValid = async (url) => {
