@@ -10,7 +10,7 @@ Automatically sync your personal GitHub repositories to Firebase to power your d
 - Extracts useful metadata:
   - Repository name
   - GitHub URL
-  - Live demo link (from repo `homepage`)
+  - Live demo link
   - Description
   - Topics
   - Last updated timestamp  
